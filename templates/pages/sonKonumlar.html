@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Araç Takip Uygulaması</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+        <style type="text/css">
+          
+      /* Set the size of the div element that contains the map */
+      #map {
+        height: 400px;
+        /* The height is 400 pixels */
+        width: 50%;
+        /* The width is the width of the web page */
+      }
+
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: "Roboto", "sans-serif";
+        line-height: 30px;
+        padding-left: 10px;
+      }
+        </style>
+        {% comment %} <script src="{% static 'js/index2.js' %}"></script> {% endcomment %}
+        <script>
+            function initMap() {
+                ortLat=0.0
+                ortLon=0.0
+                {% for car in cars2 %}
+                ortLat += {{car.Latitude}}
+                ortLon += {{car.Longitude}}
+                {% endfor %}
+                {% for car in cars3 %}
+                ortLat += {{car.Latitude}}
+                ortLon += {{car.Longitude}}
+                {% endfor %}
+                const directionsService = new google.maps.DirectionsService();
+                const directionsService2 = new google.maps.DirectionsService();
+                const directionsRenderer = new google.maps.DirectionsRenderer({polylineOptions: {strokeColor: 'red'}});
+                const directionsRenderer2 = new google.maps.DirectionsRenderer({polylineOptions: {strokeColor: 'blue'}});
+                const map = new google.maps.Map(document.getElementById("map"), {
+                  zoom: 8,
+                  center: { lat: ortLat/50, lng: ortLon/50 },
+                });
+                directionsRenderer.setMap(map);
+                directionsRenderer2.setMap(map);
+                calculateAndDisplayRoute(directionsService, directionsRenderer);
+                calculateAndDisplayRoute2(directionsService2, directionsRenderer2);
+              }
+              
+              function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+
+                const waypts = [];
+                i=0
+                {% for car in cars2 %}
+                if(i==0){
+                    originLat={{car.Latitude}}
+                    originLon={{car.Longitude}}
+                }
+                else if(i=={{cars2|length}}-1){
+                    destinationLat={{car.Latitude}}
+                    destinationLon={{car.Longitude}}
+                }
+                i++
+                waypts.push({
+                    location: new google.maps.LatLng({{car.Latitude}},{{car.Longitude}}),
+                    stopover: true,
+                });
+                {% endfor %}
+                
+              
+                directionsService
+                  .route({
+                    origin: new google.maps.LatLng(originLat,originLon),
+                    destination: new google.maps.LatLng(destinationLat,destinationLon),
+                    waypoints: waypts,
+                    optimizeWaypoints: false,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                  })
+                  .then((response) => {
+                    directionsRenderer.setDirections(response);
+                    
+                    const route = response.routes[0];
+                  })
+                  .catch((e) => window.alert("Directions request failed due to " + status));
+                
+              }
+              function calculateAndDisplayRoute2(directionsService, directionsRenderer) {
+
+                const waypts = [];
+                i=0
+                {% for car in cars3 %}
+                if(i==0){
+                    originLat2={{car.Latitude}}
+                    originLon2={{car.Longitude}}
+                }
+                else if(i=={{cars3|length}}-1){
+                    destinationLat2={{car.Latitude}}
+                    destinationLon2={{car.Longitude}}
+                }
+                i++
+                waypts.push({
+                    location: new google.maps.LatLng({{car.Latitude}},{{car.Longitude}}),
+                    stopover: true,
+                });
+                {% endfor %}
+                
+              
+                directionsService
+                  .route({
+                    origin: new google.maps.LatLng(originLat2,originLon2),
+                    destination: new google.maps.LatLng(destinationLat2,destinationLon2),
+                    waypoints: waypts,
+                    optimizeWaypoints: false,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                  })
+                  .then((response) => {
+                    directionsRenderer.setDirections(response);
+                    
+                    const route = response.routes[0];
+                  })
+                  .catch((e) => window.alert("Directions request failed due to " + status));
+                
+              }
+        </script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    </head>
+    <body>
+        {% include 'partials/_navbar.html' %}
+        <main>
+            {% include 'partials/_alert.html' %}
+            <div class="container mt-4">
+                {% block content %}{% endblock %}
+            </div>
+            {% if user.is_authenticated %}
+                <h3 class="table-info active">Araçlarınızın Gittiği İstikametler</h3>
+                <!--The div element for the map -->
+                <div class="row">
+                    <div class="map-container col-md-8" id="map"></div>
+                    <div class="map-container col-md-4" >
+                      <form action="{% url 'aracsec' %}" method="POST">
+                        {% csrf_token %}
+                            <label class="blockquote btn-info">Aracınızı Seçin</label>
+                            <select name="aracid" id="aracid" required>
+                                {% for x in aracIDs %}
+                                    <option value="{{x}}">
+                                        {{x}}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        <br />
+                          <button class="btn btn-success">
+                            <a type="submit" class="text-light">Onayla</a>
+                        </button>
+                    </form>
+                    </div>
+                </div>
+                {% for car in cars2 %}
+                    <p class="table-info active btn-danger">
+                        Enlem:{{car.Latitude}} Boylam:{{ car.Longitude }} Tarih ve
+                        Saat:{{ dateTime1.pop }} Araç Numarası:{{ car.VehicleID }} Araç Sahibi:{{ user.username }} sira:{{ car.id }}
+                        {% comment %} tourStops.push([{ lat: {{car.Latitude}}, lng: {{car.Longitude}} }, "{{car.VehicleID}}"]) {% endcomment %}
+                    </p>
+                {% endfor %}
+                  </br>
+                  </br>
+                  </br>
+                {% for car in cars3 %}
+                    <p class="table-info active  btn-primary">
+                        Enlem:{{car.Latitude}} Boylam:{{ car.Longitude }} Tarih ve
+                        Saat:{{ dateTime2.pop }} Araç Numarası:{{ car.VehicleID }} Araç Sahibi:{{ user.username }} sira:{{ car.id }}
+                        {% comment %} tourStops.push([{ lat: {{car.Latitude}}, lng: {{car.Longitude}} }, "{{car.VehicleID}}"]) {% endcomment %}
+                    </p>
+                {% endfor %}
+                
+                <p>
+                  
+                </p>
+                <script src="{% static 'js/bootstrap.min.js' %}"></script>
+                <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+                <script src="{% static 'js/popper.min.js' %}"></script>
+                <script src="https://maps.googleapis.com/maps/api/js?key=<API-KEY>&callback=initMap&libraries=&v=weekly"
+                        async></script>
+            {% else %}
+                <h3 class="table-info">Giriş Yapın Ya Da Kaydolun</h3>
+            {% endif %}
+        </main>
+        {% include 'partials/_footer.html' %}
+    </body>
+</html>

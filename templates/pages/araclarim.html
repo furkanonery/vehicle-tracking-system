@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Araç Takip Uygulaması</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+        <style type="text/css">
+          
+      /* Set the size of the div element that contains the map */
+      #map {
+        height: 400px;
+        /* The height is 400 pixels */
+        width: 50%;
+        /* The width is the width of the web page */
+      }
+        </style>
+        {% comment %} <script src="{% static 'js/index2.js' %}"></script> {% endcomment %}
+        <script>
+      function initMap() {
+        // Set LatLng and title text for the markers. The first marker (Boynton Pass)
+        // receives the initial focus when tab is pressed. Use arrow keys to
+        // move between markers; press tab again to cycle through the map controls.
+        const tourStops = [
+          [{ }, ""],
+        ];
+        {% for car in carsNoSQL %}
+        latDB={{car.Latitude}}
+        lngDB={{car.Longitude}}
+        tarih='{{dateTime1.pop}}'
+        sira={{car.id}}
+        kullanici={{car.UserID}}-1
+        //if(tourStops.length<100) {
+          tourStops.push([{ lat: latDB, lng: lngDB }, 
+          "Latitude:"+"<br>"+latDB+"<br>"
+          +"Longitude:"+"<br>"+lngDB+"<br>"
+          +"Datetime:"+tarih+"<br>"
+          +"Sıra:"+sira+"<br>"
+          +"Sahibi:"+kullanici
+          ])
+        //}
+        {% endfor %}
+    
+        ortLat=0.0
+        ortLon=0.0
+        for(i=1;i<tourStops.length;i++){
+          ortLat += tourStops[i][0]['lat']
+          ortLon += tourStops[i][0]['lng']
+        }
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 12,
+          center: { lat:ortLat/(tourStops.length-1), lng: ortLon/(tourStops.length-1) },
+        });
+        // Create an info window to share between markers.
+        const infoWindow = new google.maps.InfoWindow();
+        var icon = new google.maps.MarkerImage("http://maps.google.com/mapfiles/ms/micons/blue.png",
+        new google.maps.Size(64, 64), new google.maps.Point(0, 0),
+        new google.maps.Point(16, 32));
+        // Create the markers.
+        tourStops.forEach(([position, title], i) => {
+          const marker = new google.maps.Marker({
+            position,
+            map,
+            title: `${title}`,
+            label: `${i}`,
+            optimized: false,
+          });
+      
+          // Add a click listener for each marker, and set up the info window.
+          marker.addListener("click", () => {
+            infoWindow.close();
+            infoWindow.setContent(marker.getTitle());
+            infoWindow.open(marker.getMap(), marker);
+          });
+        });
+      }
+        </script>
+    </head>
+    <body>
+        {% include 'partials/_navbar.html' %}
+        <main>
+            {% include 'partials/_alert.html' %}
+            <div class="container mt-4">
+                {% block content %}{% endblock %}
+            </div>
+            {% if user.is_authenticated %}
+                <h3 class="table-info active">Aracınızın Gittiği İstikametler</h3>
+                <!--The div element for the map -->
+                <div class="row">
+                    <div class="map-container col-md-8" id="map"></div>
+                </div>
+                {% for car in carsNoSQL %}
+                    <p class="table-info active">
+                        Enlem:{{car.Latitude}} Boylam:{{ car.Longitude }} Tarih ve
+                        Saat:{{dateTime2.pop}} Araç Numarası:{{ car.VehicleID }} Araç Sahibi:{{ user.username }} sira:{{ car.id }}
+                        {% comment %} tourStops.push([{ lat: {{car.Latitude}}, lng: {{car.Longitude}} }, "{{car.VehicleID}}"]) {% endcomment %}
+                    </p>
+                {% endfor %}
+                
+                <p>
+                  
+                </p>
+                <script src="{% static 'js/bootstrap.min.js' %}"></script>
+                <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+                <script src="{% static 'js/popper.min.js' %}"></script>
+                <script src="https://maps.googleapis.com/maps/api/js?key=<API-KEY>&callback=initMap&libraries=&v=weekly"
+                        async></script>
+            {% else %}
+                <h3 class="table-info">Giriş Yapın Ya Da Kaydolun</h3>
+            {% endif %}
+        </main>
+        {% include 'partials/_footer.html' %}
+    </body>
+</html>

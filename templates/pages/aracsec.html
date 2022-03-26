@@ -1,0 +1,52 @@
+{% extends 'layout.html' %}
+{% block content %}
+    {% load static %}
+    <div class="container">
+        {% if user.is_authenticated %}
+            <div class="row mx-auto">
+                <form action="{% url 'araclarim' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="col-md-10">
+                        <p>Başlangıç:{{time1}}</p>
+                        <p>Bitiş:{{time2}}</p>
+                        <p>Son 1 Saat:{{time3}}</p>
+                        <label class="blockquote btn-info">Başlangıç Zamanı</label>
+                        <input type="datetime-local" id="starttime" name="starttime" min="{{time1}}" max="{{time2}}" value="{{time3}}" required/>
+                        <br />
+                        <br />
+                        <br />
+                        <label class="blockquote btn-info">Bitiş Zamanı</label>
+                        <input type="datetime-local" id="endtime" name="endtime" min="{{time1}}" max="{{time2}}" value="{{time2}}" required/>
+                        <p class="btn-outline-info">
+                            Aracınıza Ait Girdiğiniz
+                            <br />
+                            Başlangıç Ve Bitiş 
+                            <br />
+                            Tarihi Arasındaki 
+                            <br />
+                            Veriler Gösterilecektir.
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="blockquote btn-info" style="display:none">Araç NO:
+                        <select name="aracid" id="aracid">
+                                <option value="{{aracID}}">
+                                    {{aracID}}
+                                </option>
+                        </select>
+                        </label>
+                        <p class="blockquote btn-warning">Araç NO: {{aracID}}</p>
+                    </div>
+                    <br />
+                    <div class="text-center col-md-6">
+                        <button class="btn btn-success">
+                            <a type="submit" class="text-light">Onayla</a>
+                        </button>
+                    </div>
+                </form>
+            </div>
+    </div>
+    {% else %}
+    <h3 class="table-info active">Giriş Yapın Ya Da Kaydolun</h3>
+    {% endif %}
+{% endblock %}

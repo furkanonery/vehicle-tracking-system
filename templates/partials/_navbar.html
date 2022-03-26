@@ -1,0 +1,45 @@
+<header>
+    <div class="navbar navbar-expand-sm bg-primary navbar-dark">
+        <div class="container">
+            <a href="{% url 'index' %}" class="navbar-brand">Araç Takip Sistemi</a>
+            <ul class="navbar-nav mr-auto">
+                <li {% if request.path == '/' %} class="nav-item active" {% else %} class="nav-item" {% endif %}>
+                    <a href="{% url 'index' %}" class="nav-link">Ana Sayfa</a>
+                </li>
+                <li {% if 'about' in request.path %} class="nav-item active" {% else %} class="nav-item" {% endif %}>
+                    <a href="{% url 'about' %}" class="nav-link">Hakkında</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a href="javascript:{document.getElementById('logout').submit()}"
+                           class="nav-link active btn-group-sm btn-success">({{ user.username }}) Çıkış Yap</a>
+                        <form action="{% url 'logout' %}" method="POST" id="logout">
+                            {% csrf_token %}
+                            <input type="hidden">
+                        </form>
+                    </li>
+                    {% if 'araclarim' in request.path %}
+                    <li class="nav-item active btn-outline-success">
+                        <a href="javascript:history.back()" style="color:white" class="nav-link navbar-brand" >Değerleri Değiştir</a>
+                    </li>
+                    <li class="nav-item active btn-outline-warning">
+                        <a href="{% url 'sonKonumlar' %}" style="color:black" class="nav-link navbar-brand" >Son 30 Dk Konumları</a>
+                    </li>
+                    {% elif not 'sonKonumlar' in request.path %}
+                    <li class="nav-item active btn-outline-warning">
+                        <a href="{% url 'sonKonumlar' %}" style="color:black" class="nav-link navbar-brand" >Son 30 Dk Konumları</a>
+                    </li>
+                    {% endif %}
+                {% else %}
+                    <li {% if 'login' in request.path %} class="nav-item active" {% else %} class="nav-item" {% endif %}>
+                        <a href="{% url 'login' %}" class="nav-link">Giriş Yap</a>
+                    </li>
+                    <li {% if 'register' in request.path %} class="nav-item active" {% else %} class="nav-item" {% endif %}>
+                        <a href="{% url 'register' %}" class="nav-link">Kayıt Ol</a>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </header>
