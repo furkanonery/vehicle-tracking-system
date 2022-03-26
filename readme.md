@@ -22,7 +22,13 @@ templates/pages/araclarim.html ve templates/pages/sonKonumlar.html dosyalarına 
         <script src="https://maps.googleapis.com/maps/api/js?key=<API-KEY>&callback=initMap&libraries=&v=weekly"async></script>
 
         çalıştırmak için -> python manage.py runserver
+**********************************************************************
+users:
+username   password
 
+Kullanici1 Yazlab123*
+Kullanici2 Yazlab123*
+admin      12345
 **********************************************************************
 
 Software Laboratory-2 course as the 1st project assignment
