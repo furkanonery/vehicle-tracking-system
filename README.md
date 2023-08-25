@@ -1,6 +1,6 @@
 ﻿**ARAÇ TAKİP SİSTEMİ** 
 
-`                                            `*Furkan Kadir ÖNERYILDIZ* 
+Furkan Kadir ÖNERYILDIZ
 
 **1.Giriş** 
 
