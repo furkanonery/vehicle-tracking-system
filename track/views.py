@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from datetime import datetime,timedelta
 import pymongo
 import pytz
-from pages.models import Car
+from track.models import Car
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)

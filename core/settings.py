@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'pages',
+    'track',
     'user',
     'django.contrib.admin',
     'django.contrib.auth',
