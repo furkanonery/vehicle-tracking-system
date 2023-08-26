@@ -7,6 +7,10 @@ from track.models import Car
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 
@@ -80,6 +84,7 @@ def sonKonumlar(request):
             'cars3' :list(cars5NoSQL),
             'dateTime1':dateTime1,
             'dateTime2':dateTime2,
+            'api_key':os.getenv("api_key"),
         }
 
     return render(request, 'pages/sonKonumlar.html',context)
@@ -200,5 +205,7 @@ def araclarim(request):
                 'carsNoSQL': list(carsNoSQL),
                 'carsSQLite':list(carsSQLite),
                 'dateTime1':a,
-                'dateTime2':b}
+                'dateTime2':b,
+                'api_key':os.getenv("api_key"),
+                }
     return render(request, 'pages/araclarim.html',context)
